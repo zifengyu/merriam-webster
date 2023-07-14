@@ -43,6 +43,12 @@ fn print_running_text(mut text: &str) {
                             "\\/it" => {
                                 italic = false;
                             }
+                            "dx_def" => {
+                                print!("(");
+                            }
+                            "/dx_def" => {
+                                print!(")")
+                            }
                             _ => {
                                 if token.starts_with("a_link|") {
                                     if let Some(link_text) = token.split('|').nth(1) {
@@ -57,8 +63,21 @@ fn print_running_text(mut text: &str) {
                                             true,
                                         );
                                     }
+                                } else if token.starts_with("dxt|") {
+                                    let link_text = token
+                                        .split('|')
+                                        .skip(1)
+                                        .map(|w| {
+                                            if w.len() > 0 {
+                                                w.to_owned() + " "
+                                            } else {
+                                                "".to_string()
+                                            }
+                                        })
+                                        .collect::<String>();
+                                    print_style_text(&link_text, bold, italic, true);
                                 } else {
-                                    print!("{token}");
+                                    print!("{{{}}}", token);
                                 }
                             }
                         }
@@ -99,8 +118,14 @@ fn print_sense(sense: &Value) {
     if let Value::String(sn) = &sense["sn"] {
         let ident = match sn.chars().next() {
             Some('(') => 4,
-            Some(c) => if c.is_alphabetic() { 2 } else { 0 },
-            _ => 0, 
+            Some(c) => {
+                if c.is_alphabetic() {
+                    2
+                } else {
+                    0
+                }
+            }
+            _ => 0,
         };
         for _ in 0..ident {
             print!(" ");
@@ -182,14 +207,14 @@ fn print_entry(entry: &Value) {
 }
 
 fn main() {
-    let args : Vec<String> = std::env::args().collect();
+    let args: Vec<String> = std::env::args().collect();
     if args.len() != 2 {
         println!("Usage: {} <word>", args[0]);
         return;
     }
-    
+
     let key = "9f29b177-8135-4752-a7a7-8ee2f1f79d17";
-    let word = &args[1];    
+    let word = &args[1];
     let body: Value = reqwest::blocking::get(format!(
         "https://dictionaryapi.com/api/v3/references/collegiate/json/{}?key={}",
         word, key
@@ -200,7 +225,7 @@ fn main() {
 
     if let Value::Array(entries) = body {
         for entry in entries.iter() {
-            print_entry(entry);            
+            print_entry(entry);
         }
     }
 }
