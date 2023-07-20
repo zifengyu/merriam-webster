@@ -43,12 +43,19 @@ fn print_running_text(mut text: &str) {
                             "\\/it" => {
                                 italic = false;
                             }
+                            "/it" => {
+                                italic = false;
+                            }
                             "dx_def" => {
                                 print!("(");
                             }
                             "/dx_def" => {
-                                print!(")")
+                                print!(")");
                             }
+                            "dx" => {
+                                print!("\n\t-> ");
+                            }
+                            "/dx" => {}
                             _ => {
                                 if token.starts_with("a_link|") {
                                     if let Some(link_text) = token.split('|').nth(1) {
