@@ -61,6 +61,10 @@ fn print_running_text(mut text: &str) {
                                     if let Some(link_text) = token.split('|').nth(1) {
                                         print_style_text(link_text, bold, italic, true);
                                     }
+                                } else if token.starts_with("d_link|") {
+                                    if let Some(link_text) = token.split('|').nth(1) {
+                                        print_style_text(link_text, bold, italic, true);
+                                    }
                                 } else if token.starts_with("sx|") {
                                     if let Some(link_text) = token.split('|').nth(1) {
                                         print_style_text(
